@@ -10,6 +10,9 @@ import ttlpta.ntq.todo_app.entity.User;
 import ttlpta.ntq.todo_app.exception.ApplicationException;
 import ttlpta.ntq.todo_app.repository.UserRepository;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class AuthService {
     private final UserRepository userRepository;
@@ -22,7 +25,7 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
-    public String login(LoginRequest loginRequest) {
+    public Map<String, String> login(LoginRequest loginRequest) {
         User user = userRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new ApplicationException("Invalid credentials", HttpStatus.UNAUTHORIZED, ErrorCode.AUTHENTICATION_ERROR));
 
@@ -30,6 +33,10 @@ public class AuthService {
             throw new ApplicationException("Invalid credentials", HttpStatus.UNAUTHORIZED, ErrorCode.AUTHENTICATION_ERROR);
         }
 
-        return jwtService.generateToken(user.getUsername());
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("accessToken", jwtService.generateAccessToken(user.getUsername()));
+        tokens.put("refreshToken", jwtService.generateRefreshToken(user.getUsername()));
+
+        return tokens;
     }
 } 

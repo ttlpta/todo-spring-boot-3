@@ -12,14 +12,24 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class JwtService {
     // For HS384, minimum key length is 384 bits (48 bytes)
     private static final String SECRET_KEY = "H9FhCXzCkMvct9TGJ3CgzNQDrhXZgULPzFyPUrXXxKDygDgkZVkP7xmZ3meE3khK";
-    private static final long EXPIRATION_TIME = 86400000; // 24 hours
+    private static final long ACCESS_TOKEN_EXPIRATION = 86400000; // 24 hours
+    private static final long REFRESH_TOKEN_EXPIRATION = 604800000; // 7 days
 
-    public String generateToken(String username) {
+    public String generateAccessToken(String username) {
+        return generateToken(username, ACCESS_TOKEN_EXPIRATION);
+    }
+
+    public String generateRefreshToken(String username) {
+        return generateToken(username, REFRESH_TOKEN_EXPIRATION);
+    }
+
+    private String generateToken(String username, long expirationTime) {
         try {
             Map<String, Object> claims = new HashMap<>();
             claims.put("username", username);
@@ -28,8 +38,9 @@ public class JwtService {
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .subject(username)
                     .issueTime(new Date())
-                    .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                    .expirationTime(new Date(System.currentTimeMillis() + expirationTime))
                     .claim("username", username)
+                    .jwtID(UUID.randomUUID().toString())
                     .build();
 
             // Create JWS header with HS384 algorithm
