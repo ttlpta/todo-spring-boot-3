@@ -3,6 +3,7 @@ package ttlpta.ntq.todo_app.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import ttlpta.ntq.todo_app.security.Role;
 import ttlpta.ntq.todo_app.validation.UniqueUser;
 import lombok.Data;
 import lombok.Builder;
@@ -28,4 +29,6 @@ public class UserCreationRequest {
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
+    
+    private Role role;  
 } 

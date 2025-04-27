@@ -4,7 +4,9 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.stereotype.Service;
@@ -59,6 +61,50 @@ public class JwtService {
             return signedJWT.serialize();
         } catch (JOSEException e) {
             throw new RuntimeException("Error generating JWT token", e);
+        }
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            JWSVerifier verifier = new MACVerifier(SECRET_KEY);
+            
+            // Verify signature and check expiration
+            return signedJWT.verify(verifier) && 
+                   !signedJWT.getJWTClaimsSet().getExpirationTime().before(new Date());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String extractUsername(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            return signedJWT.getJWTClaimsSet().getSubject();
+        } catch (Exception e) {
+            throw new RuntimeException("Error extracting username from token", e);
+        }
+    }
+
+    public String extractJti(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            return signedJWT.getJWTClaimsSet().getJWTID();
+        } catch (Exception e) {
+            throw new RuntimeException("Error extracting jti from token", e);
+        }
+    }
+
+    public Map<String, String> extractTokenInfo(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
+            Map<String, String> tokenInfo = new HashMap<>();
+            tokenInfo.put("username", claims.getSubject());
+            tokenInfo.put("jti", claims.getJWTID());
+            return tokenInfo;
+        } catch (Exception e) {
+            throw new RuntimeException("Error extracting token info", e);
         }
     }
 } 

@@ -39,4 +39,20 @@ public class AuthService {
 
         return tokens;
     }
+
+    public Map<String, String> refreshToken(String oldAccessToken, String refreshToken) {
+        // Validate refresh token
+        if (!jwtService.validateToken(refreshToken)) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+
+        // Get username from refresh token
+        String username = jwtService.extractUsername(refreshToken);
+        
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("accessToken", jwtService.generateAccessToken(username));
+        tokens.put("refreshToken", jwtService.generateRefreshToken(username));
+
+        return tokens;
+    }
 } 

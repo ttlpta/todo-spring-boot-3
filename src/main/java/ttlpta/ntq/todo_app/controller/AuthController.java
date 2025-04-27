@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import ttlpta.ntq.todo_app.dto.ApiResponse;
 import ttlpta.ntq.todo_app.dto.LoginRequest;
+import ttlpta.ntq.todo_app.dto.RefreshTokenRequest;
+import ttlpta.ntq.todo_app.security.JwtUtils;
 import ttlpta.ntq.todo_app.service.AuthService;
 import ttlpta.ntq.todo_app.service.TokenRevocationService;
 
@@ -19,10 +21,14 @@ import ttlpta.ntq.todo_app.service.TokenRevocationService;
 public class AuthController {
     private final AuthService authService;
     private final TokenRevocationService tokenRevocationService;
+    private final JwtUtils jwtUtils;
 
-    public AuthController(AuthService authService, TokenRevocationService tokenRevocationService) {
+    public AuthController(AuthService authService, 
+                         TokenRevocationService tokenRevocationService,
+                         JwtUtils jwtUtils) {
         this.authService = authService;
         this.tokenRevocationService = tokenRevocationService;
+        this.jwtUtils = jwtUtils;
     }
 
     @PostMapping("/login")
@@ -33,10 +39,32 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ApiResponse<Void> logout(@RequestHeader("Authorization") String authorizationHeader) {
-        String accessToken = authorizationHeader.replace("Bearer ", "");
-        String refreshToken = ""; // You might want to get this from a different header or request body
+        String accessToken = jwtUtils.extractTokenFromHeader(authorizationHeader);
+        if (accessToken == null) {
+            return ApiResponse.error("Invalid authorization header");
+        }
         
-        tokenRevocationService.revokeTokens(accessToken, refreshToken);
+        tokenRevocationService.revokeTokens(accessToken, "");
         return ApiResponse.success();
+    }
+
+    @PostMapping("/refresh-token")
+    public ApiResponse<Map<String, String>> refreshToken(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        
+        String oldAccessToken = jwtUtils.extractTokenFromHeader(authorizationHeader);
+        if (oldAccessToken == null) {
+            return ApiResponse.error("Invalid authorization header");
+        }
+        
+        String refreshToken = refreshTokenRequest.getRefreshToken();
+        
+        // Revoke old tokens
+        tokenRevocationService.revokeTokens(oldAccessToken, refreshToken);
+        
+        // Generate new tokens
+        Map<String, String> newTokens = authService.refreshToken(oldAccessToken, refreshToken);
+        return ApiResponse.success(newTokens);
     }
 } 

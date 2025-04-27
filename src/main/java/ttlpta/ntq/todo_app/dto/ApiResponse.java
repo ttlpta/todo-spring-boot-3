@@ -32,4 +32,12 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> success() {
         return new ApiResponse<>(true, null);
     }
+
+    public static <T> ApiResponse<T> error(String message) {
+        ApiResponse<T> response = new ApiResponse<>();
+        response.setSuccess(false);
+        response.setMessage(message);
+        response.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        return response;
+    }
 } 
