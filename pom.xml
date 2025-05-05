@@ -16,11 +16,11 @@
 	<description>Todo project for Spring Boot with React frontend</description>
 
 	<modules>
-		<module>identify</module>
-		<module>web-ui</module>
+		<!-- <module>identify</module> -->
+		<!-- <module>web-ui</module> -->
 		<module>discovery</module>
 		<module>gateway</module>
-		<!-- <module>user</module> -->
+		<module>user</module>
 	</modules>
 
 	<properties>

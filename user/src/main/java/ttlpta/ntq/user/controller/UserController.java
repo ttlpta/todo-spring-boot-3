@@ -1,7 +1,7 @@
 package ttlpta.ntq.user.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.security.access.prepost.PreAuthorize;
+// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ttlpta.ntq.user.dto.ApiResponse;
 import ttlpta.ntq.user.dto.UserCreationRequest;
@@ -24,37 +24,37 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+    // @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
     public ApiResponse<List<User>> getAllUsers() {
         return ApiResponse.success(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER') or (hasRole('ROLE_USER') and #id == authentication.principal.id)")
+    // @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER') or (hasRole('ROLE_USER') and #id == authentication.principal.id)")
     public ApiResponse<User> getUserById(@PathVariable UUID id) {
         return ApiResponse.success(userService.getUserById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+    // @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
     public ApiResponse<User> createUser(@Valid @RequestBody UserCreationRequest request) {
         return ApiResponse.success(userService.createUser(request));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER') or (hasRole('ROLE_USER') and #id == authentication.principal.id)")
+    // @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER') or (hasRole('ROLE_USER') and #id == authentication.principal.id)")
     public ApiResponse<User> updateUser(@PathVariable UUID id, @Valid @RequestBody UserUpdateRequest request) {
         return ApiResponse.success(userService.updateUser(id, request));
     }
 
     @PatchMapping("/{id}/password")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER') or (hasRole('ROLE_USER') and #id == authentication.principal.id)")
+    // @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER') or (hasRole('ROLE_USER') and #id == authentication.principal.id)")
     public ApiResponse<User> updatePassword(@PathVariable UUID id, @Valid @RequestBody UserPasswordUpdateRequest request) {
         return ApiResponse.success(userService.updatePassword(id, request));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') and !@userService.isAdmin(#id)")
+    // @PreAuthorize("hasRole('ROLE_ADMIN') and !@userService.isAdmin(#id)")
     public ApiResponse<Void> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
         return ApiResponse.success();
