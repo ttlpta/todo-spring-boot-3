@@ -27,6 +27,19 @@ services:
     networks:
       - todo-network
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2.2
+    container_name: todo-keycloak
+    command: start-dev
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "9000:8080"
+    restart: unless-stopped
+    networks:
+      - todo-network
+
 volumes:
   postgres_data:
   redis_data:
