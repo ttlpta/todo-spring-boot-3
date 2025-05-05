@@ -1,14 +1,14 @@
-package ttlpta.ntq.todo_app.controller;
+package ttlpta.ntq.user.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import ttlpta.ntq.todo_app.dto.ApiResponse;
-import ttlpta.ntq.todo_app.dto.UserCreationRequest;
-import ttlpta.ntq.todo_app.dto.UserPasswordUpdateRequest;
-import ttlpta.ntq.todo_app.dto.UserUpdateRequest;
-import ttlpta.ntq.todo_app.entity.User;
-import ttlpta.ntq.todo_app.service.UserService;
+import ttlpta.ntq.user.dto.ApiResponse;
+import ttlpta.ntq.user.dto.UserCreationRequest;
+import ttlpta.ntq.user.dto.UserPasswordUpdateRequest;
+import ttlpta.ntq.user.dto.UserUpdateRequest;
+import ttlpta.ntq.user.entity.User;
+import ttlpta.ntq.user.service.UserService;
 
 import java.util.List;
 import java.util.UUID;
@@ -59,4 +59,4 @@ public class UserController {
         userService.deleteUser(id);
         return ApiResponse.success();
     }
-}
+} 
